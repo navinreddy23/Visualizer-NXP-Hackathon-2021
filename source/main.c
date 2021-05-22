@@ -87,7 +87,7 @@ void USER_Process(void)
 
     	if (accuracy >= 85)
     	{
-    		PRINTF("\r\nCommand: %s, Accuracy: %u\r\n", labels[cmd], accuracy);
+    		//PRINTF("\r\nCommand: %s, Accuracy: %u\r\n", labels[cmd], accuracy);
     	}
     }
 }
@@ -104,7 +104,7 @@ int main(void)
 #if USE_CANOPEN_FD
     PRINTF("\r\nStarting CANopen FD Library slave example\r\n");
 #else
-    PRINTF("\r\nStarting CANopen Library slave example\r\n");
+    PRINTF("\r\n\r\n--------------------------Slave-----------------------------\r\n\r\n");
 #endif
     PRINTF("Provided by EmSA - www.em-sa.com/nxp\r\n");
 
