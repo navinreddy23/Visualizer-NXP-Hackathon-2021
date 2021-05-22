@@ -10,11 +10,6 @@
 
 #include "PCA9957.h"
 
-typedef enum
-{
-	LED_ON,
-	LED_OFF
-}led_state_t;
 
 void LED_Init(void);
 void LED_Delay(uint32_t delay);
