@@ -159,6 +159,8 @@ void Init_HW()
 //    /* Avoiding CAN_CLOCK_CHECK_NO_AFFECTS error in case semihosting console is used */
 //    CLOCK_EnableClock(kCLOCK_Lpuart1);
 
+    LED_Init();
+
 #if USE_LEDS
     // Initialize status LEDs
     LIBCB_InitLeds();
@@ -166,6 +168,8 @@ void Init_HW()
 
     // initialize timer interrupt - 1ms period
     SysTick_Config(SystemCoreClock / 1000U);
+
+    LED_CmdYes();
 
     return;
 }
