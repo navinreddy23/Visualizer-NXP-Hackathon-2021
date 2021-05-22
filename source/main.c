@@ -63,6 +63,44 @@ static uint8_t prevCmd = SILENCE;
 /*******************************************************************************
  * Code
  ******************************************************************************/
+void ProcessCmd(cmd_t cmd)
+{
+	switch(cmd)
+	{
+	case YES:
+		LED_CmdYes();
+		break;
+	case NO:
+		LED_CmdNo();
+		break;
+	case UP:
+		LED_CmdUp();
+		break;
+	case DOWN:
+		LED_CmdDown();
+		break;
+	case LEFT:
+		LED_CmdLeft();
+		break;
+	case RIGHT:
+		LED_CmdRight();
+		break;
+	case GO:
+		LED_CmdGo();
+		break;
+	case STOP:
+		LED_CmdStop();
+		break;
+	case ON:
+		LED_AllOn();
+		break;
+	case OFF:
+		LED_AllOff();
+		break;
+	default:
+		break;
+	}
+}
 
 /*******************************************************************************
  * DOES:    USER Process, here simple I/O example
@@ -86,9 +124,10 @@ void USER_Process(void)
     {
     	prevCmd = cmd;
 
-    	if (accuracy >= 85)
+    	if (accuracy >= 70)
     	{
-    		//PRINTF("\r\nCommand: %s, Accuracy: %u\r\n", labels[cmd], accuracy);
+    		PRINTF("\r\nCommand: %s, Accuracy: %u\r\n", labels[cmd], accuracy);
+    		ProcessCmd(cmd);
     	}
     }
 }

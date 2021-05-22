@@ -187,10 +187,10 @@ void LED_CmdStop(void)
 {
 	LED_AllOff();
 
-	LED_WriteReg(IREF11, 0xFF);
-	LED_WriteReg(IREF2, 0xFF);
-	LED_WriteReg(IREF8, 0xFF);
-	LED_WriteReg(IREF5, 0xFF);
+	LED_WriteReg(IREF9, 0xFF);
+	LED_WriteReg(IREF0, 0xFF);
+	LED_WriteReg(IREF6, 0xFF);
+	LED_WriteReg(IREF3, 0xFF);
 
 	LED_WriteReg(PWMALL, m_brightness);
 }
