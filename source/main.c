@@ -24,18 +24,19 @@ VERSION:   7.10, ESA 20-SEP-02
  ******************************************************************************/
 typedef enum
 {
-	SILENCE,
-	UNKNOWN,
-	YES,
-	NO,
-	UP,
+	BACKGROUND,
+	BRIGHTER,
+	DIMMER,
 	DOWN,
-	LEFT,
-	RIGHT,
-	ON,
-	OFF,
-	STOP,
 	GO,
+	LEFT,
+	NO,
+	OFF,
+	ON,
+	RIGHT,
+	STOP,
+	UP,
+	YES
 }cmd_t;
 /*******************************************************************************
  * Prototypes
@@ -46,20 +47,24 @@ void Init_HW(void);
  * Variables
  ******************************************************************************/
 const char* labels[] = {
-    "Silence",
-    "Unknown",
-    "yes",
-    "no",
-    "up",
-    "down",
-    "left",
-    "right",
-    "on",
-    "off",
-    "stop",
-    "go"
+		"background",
+		"brighter",
+		"dimmer",
+		"down",
+		"go",
+		"left",
+		"no",
+		"off",
+		"on",
+		"right",
+		"stop",
+		"up",
+		"yes"
 };
-static uint8_t prevCmd = SILENCE;
+
+static uint8_t prevCmd = BACKGROUND;
+static int8_t brightness = 10;
+static uint8_t brightness_delta = 5;
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -97,9 +102,22 @@ void ProcessCmd(cmd_t cmd)
 	case OFF:
 		LED_AllOff();
 		break;
+	case BRIGHTER:
+		brightness += brightness_delta;
+		break;
+	case DIMMER:
+		brightness -= brightness_delta;
+		break;
 	default:
 		break;
 	}
+
+	if (brightness < 1)
+	{
+		brightness = 1;
+	}
+
+	LED_SetBrightness(brightness);
 }
 
 /*******************************************************************************
@@ -114,7 +132,7 @@ void USER_Process(void)
     MCO_ReadProcessData(&(cmd), 1, P610001_VC_Command);
     MCO_ReadProcessData(&(accuracy), 1, P610002_VC_Accuracy);
 
-    if (cmd == SILENCE || cmd == UNKNOWN)
+    if (cmd == BACKGROUND)
     {
     	prevCmd = cmd;
     	return;
@@ -124,7 +142,7 @@ void USER_Process(void)
     {
     	prevCmd = cmd;
 
-    	if (accuracy >= 70)
+    	if (accuracy >= 80)
     	{
     		PRINTF("\r\nCommand: %s, Accuracy: %u\r\n", labels[cmd], accuracy);
     		ProcessCmd(cmd);
