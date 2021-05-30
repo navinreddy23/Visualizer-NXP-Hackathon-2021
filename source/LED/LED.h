@@ -9,7 +9,7 @@
 #define LED_LED_H_
 
 #include "PCA9957.h"
-
+#include <stdint.h>
 
 void LED_Init(void);
 void LED_Delay(uint32_t delay);
