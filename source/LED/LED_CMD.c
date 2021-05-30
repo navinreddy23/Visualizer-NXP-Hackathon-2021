@@ -18,7 +18,7 @@
  ******************************************************************************/
 #define DEFAULT_BRIGHTNESS	1
 #define BRIGHTNESS_DELTA	5
-#define CMD_ACCURACY_MIN	80
+#define CMD_ACCURACY_MIN	90
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -26,6 +26,7 @@ static void TaskCmdRxPrcoess(void* arg);
 static void PreprocessCmd(results_t results);
 static void CmdToAction(cmd_t cmd);
 static void CheckAndSetBrightness(int8_t val);
+static bool IsAccurate(uint8_t accuracy);
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -53,6 +54,9 @@ static void TaskCmdRxPrcoess(void* arg)
 static void PreprocessCmd(results_t results)
 {
 	static uint8_t prevCmd = BACKGROUND;
+	static bool paused = false;
+	static uint8_t cmdCount = 0;
+
 	uint8_t cmd;
 	uint8_t accuracy;
 
@@ -61,20 +65,37 @@ static void PreprocessCmd(results_t results)
 
 	if (cmd == BACKGROUND)
 	{
-		prevCmd = cmd;
+		paused = true;
 		return;
 	}
 
 	if (prevCmd != cmd)
 	{
+		LED_BlinkOff();
 		prevCmd = cmd;
 
-		if (accuracy >= CMD_ACCURACY_MIN)
+		if(!IsAccurate(accuracy))
+			return;
+
+		cmdCount++;
+		PRINTF("\r\nCommand: %s, Accuracy: %u\r\n", cmdLabels[cmd], accuracy);
+		CmdToAction(cmd);
+	}
+	else if(paused)
+	{
+		//Check if there was a pause (background) between commands.
+		paused = !paused;
+
+		if(cmdCount == 0 && IsAccurate(accuracy))
 		{
-			PRINTF("\r\nCommand: %s, Accuracy: %u\r\n", cmdLabels[cmd], accuracy);
+			LED_BlinkOn(10, 128);
 			CmdToAction(cmd);
 		}
+		cmdCount = 0;
 	}
+	//Note: The same command is received multiple times due to the CANOpen refresh times.
+	//The above condition takes care to filter the CMD and blinks only if the same CMD is
+	//spoken twice atleast.
 }
 
 static void CmdToAction(cmd_t cmd)
@@ -128,10 +149,18 @@ static void CmdToAction(cmd_t cmd)
 
 static void CheckAndSetBrightness(int8_t val)
 {
+	//Turn-off blink for brighter and dimmer to see the changes.
+	LED_BlinkOff();
+
 	if (val < 1)
 	{
 		val = 1;
 	}
 
 	LED_SetBrightness(val);
+
+}
+static bool IsAccurate(uint8_t accuracy)
+{
+	return (accuracy >= CMD_ACCURACY_MIN);
 }
