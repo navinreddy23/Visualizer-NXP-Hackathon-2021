@@ -1,5 +1,6 @@
 #include "mcop_inc.h"
 #include "LED.h"
+#include "timer.h"
 #include "main.h"
 
 /*******************************************************************************
@@ -10,7 +11,7 @@
  * Prototypes
  ******************************************************************************/
 static void Init_HW(void);
-
+static void Tick(void);
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -103,6 +104,8 @@ int main(void)
 {
     Init_HW();
 
+    TIMER_SetCallBack(Tick);
+
     PRINTF("\r\n\r\n--------------LED PCA9957-------------\r\n\r\n");
 
     LED_CmdYes();
@@ -136,19 +139,17 @@ static void Init_HW()
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
 
+    TIMER_Init();
     LED_Init();
 
 #if USE_LEDS
     LIBCB_InitLeds();
 #endif
 
-    // initialize timer interrupt - 1ms period
-    SysTick_Config(SystemCoreClock / 1000U);
-
     return;
 }
 
-void SysTick_Handler(void)
+static void Tick(void)
 {
     MCOHW_Tick();
 }
