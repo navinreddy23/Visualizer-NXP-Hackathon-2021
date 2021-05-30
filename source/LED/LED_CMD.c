@@ -18,14 +18,13 @@
  ******************************************************************************/
 #define DEFAULT_BRIGHTNESS	1
 #define BRIGHTNESS_DELTA	5
-#define CMD_ACCURACY_MIN	90
+#define CMD_ACCURACY_MIN	70
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
 static void TaskCmdRxPrcoess(void* arg);
 static void PreprocessCmd(results_t results);
 static void CmdToAction(cmd_t cmd);
-static void CheckAndSetBrightness(int8_t val);
 static bool IsAccurate(uint8_t accuracy);
 /*******************************************************************************
  * Variables
@@ -53,7 +52,7 @@ static void TaskCmdRxPrcoess(void* arg)
 
 static void PreprocessCmd(results_t results)
 {
-	static uint8_t prevCmd = BACKGROUND;
+	static uint8_t prevCmd = SILENCE;
 	static bool paused = false;
 	static uint8_t cmdCount = 0;
 
@@ -63,7 +62,7 @@ static void PreprocessCmd(results_t results)
 	cmd = results.label;
 	accuracy = results.accuracy;
 
-	if (cmd == BACKGROUND)
+	if (cmd == UNKNOWN || cmd == SILENCE)
 	{
 		paused = true;
 		return;
@@ -134,32 +133,11 @@ static void CmdToAction(cmd_t cmd)
 	case OFF:
 		LED_AllOff();
 		break;
-	case BRIGHTER:
-		brightness += BRIGHTNESS_DELTA;
-		CheckAndSetBrightness(brightness);
-		break;
-	case DIMMER:
-		brightness -= BRIGHTNESS_DELTA;
-		CheckAndSetBrightness(brightness);
-		break;
 	default:
 		break;
 	}
 }
 
-static void CheckAndSetBrightness(int8_t val)
-{
-	//Turn-off blink for brighter and dimmer to see the changes.
-	LED_BlinkOff();
-
-	if (val < 1)
-	{
-		val = 1;
-	}
-
-	LED_SetBrightness(val);
-
-}
 static bool IsAccurate(uint8_t accuracy)
 {
 	return (accuracy >= CMD_ACCURACY_MIN);

@@ -13,19 +13,18 @@
  ******************************************************************************/
 typedef enum
 {
-	BACKGROUND,
-	BRIGHTER,
-	DIMMER,
-	DOWN,
-	GO,
-	LEFT,
+	SILENCE,
+	UNKNOWN,
+	YES,
 	NO,
-	OFF,
-	ON,
-	RIGHT,
-	STOP,
 	UP,
-	YES
+	DOWN,
+	LEFT,
+	RIGHT,
+	ON,
+	OFF,
+	STOP,
+	GO,
 }cmd_t;
 
 /*******************************************************************************
@@ -37,19 +36,18 @@ void LED_CMD_Init(void);
  * Variables
  ******************************************************************************/
 static const char* cmdLabels[] = {
-		"background",
-		"brighter",
-		"dimmer",
-		"down",
-		"go",
-		"left",
-		"no",
-		"off",
-		"on",
-		"right",
-		"stop",
-		"up",
-		"yes"
+    "Silence",
+    "Unknown",
+    "yes",
+    "no",
+    "up",
+    "down",
+    "left",
+    "right",
+    "on",
+    "off",
+    "stop",
+    "go"
 };
 
 #endif /* LED_LED_CMD_H_ */
