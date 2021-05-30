@@ -1,10 +1,11 @@
-#include "LED.h"
-#include "timer.h"
 #include "pin_mux.h"
 #include "fsl_debug_console.h"
 #include "board.h"
+
+#include "LED.h"
 #include "CANOpen.h"
 #include "LED_CMD.h"
+#include "timer.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
