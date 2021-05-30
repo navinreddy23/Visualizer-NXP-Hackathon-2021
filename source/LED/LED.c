@@ -65,6 +65,7 @@ void LED_WriteReg(PCA9957_reg_t reg, uint8_t value)
 void LED_SetBrightness(uint8_t value)
 {
 	m_brightness = value;
+	LED_WriteReg(PWMALL, m_brightness);
 }
 
 void LED_AllOff(void)
