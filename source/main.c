@@ -16,7 +16,7 @@
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-static void Init_HW(void);
+static void InitializeHardware(void);
 void vApplicationStackOverflowHook (TaskHandle_t xTask,
 								    signed char *pcTaskName);
 /*******************************************************************************
@@ -29,7 +29,7 @@ void vApplicationStackOverflowHook (TaskHandle_t xTask,
 
 int main(void)
 {
-    Init_HW();
+    InitializeHardware();
 
     PRINTF("\r\n\r\n--------------LED PCA9957-------------\r\n\r\n");
 
@@ -42,7 +42,7 @@ int main(void)
     vTaskStartScheduler();
 }
 
-static void Init_HW()
+static void InitializeHardware(void)
 {
     /* Board pin, clock, debug console init */
     BOARD_ConfigMPU();
