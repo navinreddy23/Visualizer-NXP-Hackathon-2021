@@ -18,7 +18,8 @@
  ******************************************************************************/
 static void InitializeHardware(void);
 void vApplicationStackOverflowHook (TaskHandle_t xTask,
-								    signed char *pcTaskName);
+		signed char *pcTaskName);
+
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -29,35 +30,35 @@ void vApplicationStackOverflowHook (TaskHandle_t xTask,
 
 int main(void)
 {
-    InitializeHardware();
+	InitializeHardware();
 
-    PRINTF("\r\n\r\n--------------LED PCA9957-------------\r\n\r\n");
+	PRINTF("\r\n\r\n--------------LED PCA9957-------------\r\n\r\n");
 
-    LED_CmdYes();
+	LED_CmdYes();
 
-    CANOpen_Init();
+	CANOpen_Init();
 
-    LED_CMD_Init();
+	LED_CMD_Init();
 
-    vTaskStartScheduler();
+	vTaskStartScheduler();
 }
 
 static void InitializeHardware(void)
 {
-    /* Board pin, clock, debug console init */
-    BOARD_ConfigMPU();
-    BOARD_InitPins();
-    BOARD_BootClockRUN();
-    BOARD_InitDebugConsole();
+	/* Board pin, clock, debug console init */
+	BOARD_ConfigMPU();
+	BOARD_InitPins();
+	BOARD_BootClockRUN();
+	BOARD_InitDebugConsole();
 
-    TIMER_Init();
-    LED_Init();
+	TIMER_Init();
+	LED_Init();
 
 #if USE_LEDS
-    LIBCB_InitLeds();
+	LIBCB_InitLeds();
 #endif
 
-    return;
+	return;
 }
 
 void vApplicationStackOverflowHook (TaskHandle_t xTask, signed char *pcTaskName)

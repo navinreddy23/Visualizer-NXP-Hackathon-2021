@@ -4,18 +4,9 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-#include <stdio.h>
 #include "board.h"
-#include "stdbool.h"
-#include "timer.h"
 #include "fsl_qtmr.h"
-//#include "mcop_mgr_inc.h"
-
-#if defined(__ICCARM__) || defined(__ARMCC_VERSION) || defined(__REDLIB__)
-#include <time.h>
-#else
-#include <sys/time.h>
-#endif
+#include "timer.h"
 
 /*******************************************************************************
  * Definitions
@@ -58,41 +49,40 @@ void QTMR_IRQ_HANDLER(void)
 		cbTimerTick();
 	}
 
-    /* Clear interrupt flag.*/
-    QTMR_ClearStatusFlags(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, kQTMR_CompareFlag);
+	/* Clear interrupt flag.*/
+	QTMR_ClearStatusFlags(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, kQTMR_CompareFlag);
 
-    SDK_ISR_EXIT_BARRIER;
+	SDK_ISR_EXIT_BARRIER;
 }
 
 void TIMER_Init()
 {
 	qtmr_config_t qtmrConfig;
 
-    QTMR_GetDefaultConfig(&qtmrConfig);
-    qtmrConfig.primarySource = QTMR_PRIMARY_SOURCE;
+	QTMR_GetDefaultConfig(&qtmrConfig);
+	qtmrConfig.primarySource = QTMR_PRIMARY_SOURCE;
 
-    QTMR_Init(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, &qtmrConfig);
+	QTMR_Init(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, &qtmrConfig);
 
-    /* Set timer period to be 1 millisecond */
-    QTMR_SetTimerPeriod(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, MSEC_TO_COUNT(1U, QTMR_SOURCE_CLOCK));
+	/* Set timer period to be 1 millisecond */
+	QTMR_SetTimerPeriod(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, MSEC_TO_COUNT(1U, QTMR_SOURCE_CLOCK));
 
-    /* Enable at the NVIC */
-    EnableIRQ(QTMR_IRQ_ID);
+	/* Enable at the NVIC */
+	EnableIRQ(QTMR_IRQ_ID);
 
-    /* Enable timer compare interrupt */
-    QTMR_EnableInterrupts(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, kQTMR_CompareInterruptEnable);
+	/* Enable timer compare interrupt */
+	QTMR_EnableInterrupts(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, kQTMR_CompareInterruptEnable);
 
-    /* Start the second channel to count on rising edge of the primary source clock */
-    QTMR_StartTimer(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, kQTMR_PriSrcRiseEdge);
+	/* Start the second channel to count on rising edge of the primary source clock */
+	QTMR_StartTimer(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, kQTMR_PriSrcRiseEdge);
 }
 
 uint32_t TIMER_GetTimeInMs()
 {
-    return msTicks;
+	return msTicks;
 }
 
 void TIMER_SetCallBack(cb_timer_handle_t funcPtr)
 {
 	cbTimerTick = funcPtr;
 }
-

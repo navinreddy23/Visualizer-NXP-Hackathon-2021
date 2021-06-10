@@ -81,26 +81,26 @@ void LED_AllOn(void)
 
 void LED_BlinkOn(uint8_t freq, uint8_t pwm)
 {
-    LED_WriteReg(LEDOUT0, BLINK_MODE);
-    LED_WriteReg(LEDOUT1, BLINK_MODE);
-    LED_WriteReg(LEDOUT2, BLINK_MODE);
-    LED_WriteReg(LEDOUT3, BLINK_MODE);
-    LED_WriteReg(LEDOUT4, BLINK_MODE);
-    LED_WriteReg(LEDOUT5, BLINK_MODE);
+	LED_WriteReg(LEDOUT0, BLINK_MODE);
+	LED_WriteReg(LEDOUT1, BLINK_MODE);
+	LED_WriteReg(LEDOUT2, BLINK_MODE);
+	LED_WriteReg(LEDOUT3, BLINK_MODE);
+	LED_WriteReg(LEDOUT4, BLINK_MODE);
+	LED_WriteReg(LEDOUT5, BLINK_MODE);
 
-    LED_WriteReg(MODE2, 0x21);
-    LED_WriteReg(GRPFREQ, freq);
-    LED_WriteReg(GRPPWM, pwm);
+	LED_WriteReg(MODE2, 0x21);
+	LED_WriteReg(GRPFREQ, freq);
+	LED_WriteReg(GRPPWM, pwm);
 }
 
 void LED_BlinkOff(void)
 {
-    LED_WriteReg(LEDOUT0, PWM_MODE);
-    LED_WriteReg(LEDOUT1, PWM_MODE);
-    LED_WriteReg(LEDOUT2, PWM_MODE);
-    LED_WriteReg(LEDOUT3, PWM_MODE);
-    LED_WriteReg(LEDOUT4, PWM_MODE);
-    LED_WriteReg(LEDOUT5, PWM_MODE);
+	LED_WriteReg(LEDOUT0, PWM_MODE);
+	LED_WriteReg(LEDOUT1, PWM_MODE);
+	LED_WriteReg(LEDOUT2, PWM_MODE);
+	LED_WriteReg(LEDOUT3, PWM_MODE);
+	LED_WriteReg(LEDOUT4, PWM_MODE);
+	LED_WriteReg(LEDOUT5, PWM_MODE);
 }
 
 void LED_CmdLeft(void)
@@ -222,34 +222,34 @@ void LED_RedTest(void)
 
 static void LED_SPI_Init(void)
 {
-    /*Set clock source for LPSPI*/
-    CLOCK_SetMux(kCLOCK_LpspiMux, BOARD_LPSPI_CLOCK_SOURCE_SELECT);
-    CLOCK_SetDiv(kCLOCK_LpspiDiv, BOARD_LPSPI_CLOCK_SOURCE_DIVIDER);
+	/*Set clock source for LPSPI*/
+	CLOCK_SetMux(kCLOCK_LpspiMux, BOARD_LPSPI_CLOCK_SOURCE_SELECT);
+	CLOCK_SetDiv(kCLOCK_LpspiDiv, BOARD_LPSPI_CLOCK_SOURCE_DIVIDER);
 
-    lpspi_master_config_t masterConfig;
+	lpspi_master_config_t masterConfig;
 
-    /* Master config */
-    masterConfig.baudRate                      = 500000U;
-    masterConfig.bitsPerFrame                  = 8;
-    masterConfig.cpol                          = kLPSPI_ClockPolarityActiveHigh;
-    masterConfig.cpha                          = kLPSPI_ClockPhaseFirstEdge;
-    masterConfig.direction                     = kLPSPI_MsbFirst;
-    masterConfig.whichPcs                      = BOARD_LPSPI_PCS_FOR_INIT;
-    masterConfig.pcsActiveHighOrLow            = kLPSPI_PcsActiveLow;
-    masterConfig.pinCfg                        = kLPSPI_SdiInSdoOut;
-    masterConfig.dataOutConfig                 = kLpspiDataOutTristate;
-    masterConfig.pcsToSckDelayInNanoSec        = 1000000000 / masterConfig.baudRate;
-    masterConfig.lastSckToPcsDelayInNanoSec    = 1000000000 / masterConfig.baudRate;
-    masterConfig.betweenTransferDelayInNanoSec = 1000000000 / masterConfig.baudRate;
+	/* Master config */
+	masterConfig.baudRate                      = 500000U;
+	masterConfig.bitsPerFrame                  = 8;
+	masterConfig.cpol                          = kLPSPI_ClockPolarityActiveHigh;
+	masterConfig.cpha                          = kLPSPI_ClockPhaseFirstEdge;
+	masterConfig.direction                     = kLPSPI_MsbFirst;
+	masterConfig.whichPcs                      = BOARD_LPSPI_PCS_FOR_INIT;
+	masterConfig.pcsActiveHighOrLow            = kLPSPI_PcsActiveLow;
+	masterConfig.pinCfg                        = kLPSPI_SdiInSdoOut;
+	masterConfig.dataOutConfig                 = kLpspiDataOutTristate;
+	masterConfig.pcsToSckDelayInNanoSec        = 1000000000 / masterConfig.baudRate;
+	masterConfig.lastSckToPcsDelayInNanoSec    = 1000000000 / masterConfig.baudRate;
+	masterConfig.betweenTransferDelayInNanoSec = 1000000000 / masterConfig.baudRate;
 
-    LPSPI_MasterInit(BOARD_EEPROM_LPSPI_BASEADDR, &masterConfig, BOARD_LPSPI_CLK_FREQ);
+	LPSPI_MasterInit(BOARD_EEPROM_LPSPI_BASEADDR, &masterConfig, BOARD_LPSPI_CLK_FREQ);
 }
 
 static void LED_SPI_Transfer(uint8_t* pArray, uint8_t size)
 {
-    masterXfer.txData      = pArray;
-    masterXfer.rxData      = NULL;
-    masterXfer.dataSize    = size;
-    masterXfer.configFlags = BOARD_LPSPI_PCS_FOR_TRANSFER | kLPSPI_MasterPcsContinuous;
-    LPSPI_MasterTransferBlocking(BOARD_EEPROM_LPSPI_BASEADDR, &masterXfer);
+	masterXfer.txData      = pArray;
+	masterXfer.rxData      = NULL;
+	masterXfer.dataSize    = size;
+	masterXfer.configFlags = BOARD_LPSPI_PCS_FOR_TRANSFER | kLPSPI_MasterPcsContinuous;
+	LPSPI_MasterTransferBlocking(BOARD_EEPROM_LPSPI_BASEADDR, &masterXfer);
 }

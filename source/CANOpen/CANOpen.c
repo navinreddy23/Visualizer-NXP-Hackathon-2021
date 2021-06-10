@@ -54,7 +54,7 @@ static void TaskCANOpenProcessPDO(void* arg)
 	while(1)
 	{
 		xTaskNotifyWait(0, 0, &notification, portMAX_DELAY);
-	   // Process all output data from CANopen
+		// Process all output data from CANopen
 		MCO_ReadProcessData(&(results.label), 1, P610001_VC_Command);
 		MCO_ReadProcessData(&(results.accuracy), 1, P610002_VC_Accuracy);
 
@@ -66,31 +66,31 @@ static void TaskCANOpenProcessPDO(void* arg)
 
 static void TaskCANOpenSlave(void* arg)
 {
-    MCOUSER_ResetCommunication();
+	MCOUSER_ResetCommunication();
 
-    while (1)
-    {
-        // Operate on CANopen protocol stack
-        MCO_ProcessStack();
+	while (1)
+	{
+		// Operate on CANopen protocol stack
+		MCO_ProcessStack();
 
-        // Operate on application
-        if (MY_NMT_STATE == NMTSTATE_OP)
-        {
-        	// only when we are operational
-        	xTaskNotify(hTaskPDOProcess, 0, eNoAction);
-        }
+		// Operate on application
+		if (MY_NMT_STATE == NMTSTATE_OP)
+		{
+			// only when we are operational
+			xTaskNotify(hTaskPDOProcess, 0, eNoAction);
+		}
 
-        // Check for CAN Err, auto-recover
-        if (MCOHW_GetStatus() & HW_BOFF)
-        {
-            MCOUSER_FatalError(0xF6F6);
-        }
+		// Check for CAN Err, auto-recover
+		if (MCOHW_GetStatus() & HW_BOFF)
+		{
+			MCOUSER_FatalError(0xF6F6);
+		}
 
-        vTaskDelay(10);
-    }
+		vTaskDelay(10);
+	}
 }
 
 static void Tick(void)
 {
-    MCOHW_Tick();
+	MCOHW_Tick();
 }
