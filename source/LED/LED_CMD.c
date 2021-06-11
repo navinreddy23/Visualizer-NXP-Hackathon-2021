@@ -17,22 +17,22 @@
  * Definitions
  ******************************************************************************/
 #define DEFAULT_BRIGHTNESS	1
-#define BRIGHTNESS_DELTA	5
-#define CMD_ACCURACY_MIN	90
-
+#define BRIGHTNESS_DELTA		5
+#define CMD_ACCURACY_MIN		90
+#define MAX_BRIGHTNESS 			0xFF
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
 static void TaskCmdRxPrcoess(void* arg);
 static void PreprocessCmd(results_t results);
 static void CmdToAction(cmd_t cmd);
-static void CheckAndSetBrightness(int8_t val);
+static int16_t CheckAndSetBrightness(int16_t val);
 static bool IsAccurate(uint8_t accuracy);
 /*******************************************************************************
  * Variables
  ******************************************************************************/
 extern QueueHandle_t qResults;
-
+static int16_t brightness = DEFAULT_BRIGHTNESS;
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -101,7 +101,6 @@ static void PreprocessCmd(results_t results)
 
 static void CmdToAction(cmd_t cmd)
 {
-	static int8_t brightness = DEFAULT_BRIGHTNESS;
 
 	switch(cmd)
 	{
@@ -137,28 +136,38 @@ static void CmdToAction(cmd_t cmd)
 		break;
 	case BRIGHTER:
 		brightness += BRIGHTNESS_DELTA;
-		CheckAndSetBrightness(brightness);
+		brightness = CheckAndSetBrightness(brightness);
 		break;
 	case DIMMER:
 		brightness -= BRIGHTNESS_DELTA;
-		CheckAndSetBrightness(brightness);
+		brightness = CheckAndSetBrightness(brightness);
 		break;
 	default:
 		break;
 	}
 }
 
-static void CheckAndSetBrightness(int8_t val)
+static int16_t CheckAndSetBrightness(int16_t val)
 {
 	//Turn-off blink for brighter and dimmer to see the changes.
 	LED_BlinkOff();
 
-	if (val < 1)
+	if (val < DEFAULT_BRIGHTNESS)
 	{
-		val = 1;
+		val = DEFAULT_BRIGHTNESS;
 	}
 
+
+
+	if(val > MAX_BRIGHTNESS)
+	{
+		val = MAX_BRIGHTNESS;
+	}
+
+	PRINTF("LED Intensity: %.2f %%\r\n", brightness*100/255.0);
+
 	LED_SetBrightness(val);
+	return val;
 
 }
 static bool IsAccurate(uint8_t accuracy)
