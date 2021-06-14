@@ -32,11 +32,16 @@ QueueHandle_t qResults;
 /*******************************************************************************
  * Code
  ******************************************************************************/
+
+/**
+ * @brief Create tasks and a queue to process the received data over CANopen.
+ * 				Set a callback function to provide a timer source to the CANopen stack.
+ */
 void CANOpen_Init(void)
 {
 	xTaskCreate(TaskCANOpenSlave, "CANOpen task", 512, NULL, 2, NULL);
 	xTaskCreate(TaskCANOpenProcessPDO, "PDO Task", 256, NULL, 1, &hTaskPDOProcess);
-	qResults = xQueueCreate(3, sizeof(results_t));
+	qResults = xQueueCreate(100, sizeof(results_t));
 
 	if(qResults == NULL)
 	{
@@ -46,6 +51,10 @@ void CANOpen_Init(void)
 	TIMER_SetCallBack(Tick);
 }
 
+/**
+ * @brief Task handles the Rx PDO's. Once this task is notified from the
+ *        CANopen Slave task, it inserts the results in a queue.
+ */
 static void TaskCANOpenProcessPDO(void* arg)
 {
 	results_t results;
@@ -54,16 +63,18 @@ static void TaskCANOpenProcessPDO(void* arg)
 	while(1)
 	{
 		xTaskNotifyWait(0, 0, &notification, portMAX_DELAY);
+
 		// Process all output data from CANopen
 		MCO_ReadProcessData(&(results.label), 1, P610001_VC_Command);
 		MCO_ReadProcessData(&(results.accuracy), 1, P610002_VC_Accuracy);
 
 		xQueueSend(qResults, &results, 0);
 	}
-
-
 }
 
+/**
+ * @brief This task represents this CAN node on the network as a slave device.
+ */
 static void TaskCANOpenSlave(void* arg)
 {
 	MCOUSER_ResetCommunication();
@@ -90,6 +101,9 @@ static void TaskCANOpenSlave(void* arg)
 	}
 }
 
+/**
+ * @brief Provides a tick to the CANopen stack.
+ */
 static void Tick(void)
 {
 	MCOHW_Tick();

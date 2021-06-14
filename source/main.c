@@ -28,21 +28,33 @@ void vApplicationStackOverflowHook (TaskHandle_t xTask,
  * Code
  ******************************************************************************/
 
+/**
+ * @brief Application entry point. Init hardware, create tasks, and start the OS.
+ */
 int main(void)
 {
 	InitializeHardware();
 
 	PRINTF("\r\n\r\n--------------LED PCA9957-------------\r\n\r\n");
 
+	//Turn on an LED to show that the system has booted.
 	LED_CmdYes();
 
+	//Create tasks and queues.
 	CANOpen_Init();
-
 	LED_CMD_Init();
 
+	//Starts the OS
 	vTaskStartScheduler();
+
+	while(1);
+
+	return 0;
 }
 
+/**
+ * @brief Initialise the necessary peripherals, clock etc.
+ */
 static void InitializeHardware(void)
 {
 	/* Board pin, clock, debug console init */
@@ -54,13 +66,12 @@ static void InitializeHardware(void)
 	TIMER_Init();
 	LED_Init();
 
-#if USE_LEDS
-	LIBCB_InitLeds();
-#endif
-
 	return;
 }
 
+/**
+ * @brief FreeRTOS hook function to catch Stack Overflow issues.
+ */
 void vApplicationStackOverflowHook (TaskHandle_t xTask, signed char *pcTaskName)
 {
 	(void)xTask;

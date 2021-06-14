@@ -43,16 +43,30 @@ static void LED_SPI_Transfer(uint8_t* pArray, uint8_t size);
  * Code
  ******************************************************************************/
 
+/**
+ * @brief Initialize the SPI driver.
+ */
 void LED_Init(void)
 {
 	LED_SPI_Init();
 }
 
+/**
+ * @brief A simple for-loop delay to provide a brief interval between two
+ * 				SPI transcations.
+ * @param delay The loop count value.
+ */
 void LED_Delay(uint32_t delay)
 {
 	for(uint32_t i = 0; i < delay; i++);
 }
 
+/**
+ * @brief This function writes the register address followed by the value
+ *       to PCA9957.
+ * @param reg Register address value from PCA9957.h
+ * @param value The value of the reg to be set.
+ */
 void LED_WriteReg(PCA9957_reg_t reg, uint8_t value)
 {
 	masterTxData[0] = (uint8_t)reg << 1;
@@ -62,24 +76,38 @@ void LED_WriteReg(PCA9957_reg_t reg, uint8_t value)
 	LED_Delay(400);
 }
 
+/**
+ * @brief Function to set the brightness of all the LED's on PCA9957
+ */
 void LED_SetBrightness(uint8_t value)
 {
 	m_brightness = value;
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
+/**
+ * @brief Turns-off all the LED's on PCA9957
+ */
 void LED_AllOff(void)
 {
 	LED_WriteReg(IREFALL, 0x00);
 }
 
+/**
+ * @brief Turns-on all the LED's on PCA9957
+ */
 void LED_AllOn(void)
 {
 	LED_WriteReg(IREFALL, 0xFF);
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
-void LED_BlinkOn(uint8_t freq, uint8_t pwm)
+/**
+ * @brief Sets all the LED's to blink mode.
+ * @param frequency The blink frequency in the range 0-255
+ * @param pwm The duty cycle for blinking in the range 0-255
+ */
+void LED_BlinkOn(uint8_t frequency, uint8_t pwm)
 {
 	LED_WriteReg(LEDOUT0, BLINK_MODE);
 	LED_WriteReg(LEDOUT1, BLINK_MODE);
@@ -89,10 +117,13 @@ void LED_BlinkOn(uint8_t freq, uint8_t pwm)
 	LED_WriteReg(LEDOUT5, BLINK_MODE);
 
 	LED_WriteReg(MODE2, 0x21);
-	LED_WriteReg(GRPFREQ, freq);
+	LED_WriteReg(GRPFREQ, frequency);
 	LED_WriteReg(GRPPWM, pwm);
 }
 
+/**
+ * @brief Turn-off the blink mode.
+ */
 void LED_BlinkOff(void)
 {
 	LED_WriteReg(LEDOUT0, PWM_MODE);
@@ -103,6 +134,9 @@ void LED_BlinkOff(void)
 	LED_WriteReg(LEDOUT5, PWM_MODE);
 }
 
+/**
+ * @brief Turns on the Left four LED's on PCA9957-ARD board.
+ */
 void LED_CmdLeft(void)
 {
 	LED_AllOff();
@@ -117,10 +151,12 @@ void LED_CmdLeft(void)
 	LED_WriteReg(IREF1, 0xFF);
 	LED_WriteReg(IREF2, 0xFF);
 
-
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
+/**
+ * @brief Turn-on the Right four LED's on PCA9957-ARD board.
+ */
 void LED_CmdRight(void)
 {
 	LED_AllOff();
@@ -138,6 +174,9 @@ void LED_CmdRight(void)
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
+/**
+ * @brief Turn-on the top four LED's on PCA9957-ARD board.
+ */
 void LED_CmdUp(void)
 {
 	LED_AllOff();
@@ -152,6 +191,9 @@ void LED_CmdUp(void)
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
+/**
+ * @brief Turn-on the bottom four LED's on PCA9957-ARD board.
+ */
 void LED_CmdDown(void)
 {
 	LED_AllOff();
@@ -166,6 +208,9 @@ void LED_CmdDown(void)
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
+/**
+ * @brief Turn-on the Green LED on top-right corner on PCA9957-ARD board.
+ */
 void LED_CmdYes(void)
 {
 	LED_AllOff();
@@ -175,6 +220,9 @@ void LED_CmdYes(void)
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
+/**
+ * @brief Turn-on the Blue LED on top-right corner on PCA9957-ARD board.
+ */
 void LED_CmdNo(void)
 {
 	LED_AllOff();
@@ -184,6 +232,9 @@ void LED_CmdNo(void)
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
+/**
+ * @brief Turn-on the four Blue LED's on four corners of PCA9957-ARD board.
+ */
 void LED_CmdStop(void)
 {
 	LED_AllOff();
@@ -196,6 +247,9 @@ void LED_CmdStop(void)
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
+/**
+ * @brief Turn-on the four Green LED's on four corners of PCA9957-ARD board.
+ */
 void LED_CmdGo(void)
 {
 	LED_AllOff();
@@ -208,6 +262,9 @@ void LED_CmdGo(void)
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
+/**
+ * @brief Test function to check if the Red LED's are functional.
+ */
 void LED_RedTest(void)
 {
 	LED_AllOff();
@@ -220,6 +277,9 @@ void LED_RedTest(void)
 	LED_WriteReg(PWMALL, m_brightness);
 }
 
+/**
+ * @brief Initialize SPI.
+ */
 static void LED_SPI_Init(void)
 {
 	/*Set clock source for LPSPI*/
@@ -245,6 +305,11 @@ static void LED_SPI_Init(void)
 	LPSPI_MasterInit(BOARD_EEPROM_LPSPI_BASEADDR, &masterConfig, BOARD_LPSPI_CLK_FREQ);
 }
 
+/**
+ * @brief Transfer data on the SPI bus.
+ * @param pArray pointer to the array that has to be sent
+ * @param size The length of the array.
+ */
 static void LED_SPI_Transfer(uint8_t* pArray, uint8_t size)
 {
 	masterXfer.txData      = pArray;

@@ -20,27 +20,40 @@
 #define BRIGHTNESS_DELTA		5
 #define CMD_ACCURACY_MIN		90
 #define MAX_BRIGHTNESS 			0xFF
+
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
 static void TaskCmdRxPrcoess(void* arg);
 static void PreprocessCmd(results_t results);
 static void CmdToAction(cmd_t cmd);
-static int16_t CheckAndSetBrightness(int16_t val);
+static int16_t CheckAndSetBrightness(int16_t value);
 static bool IsAccurate(uint8_t accuracy);
+
 /*******************************************************************************
  * Variables
  ******************************************************************************/
 extern QueueHandle_t qResults;
 static int16_t brightness = DEFAULT_BRIGHTNESS;
+
 /*******************************************************************************
  * Code
  ******************************************************************************/
+
+/**
+ * @brief Creates a task to handle the received commands from CANopen.
+ */
 void LED_CMD_Init(void)
 {
 	xTaskCreate(TaskCmdRxPrcoess, "Rx Cmd Task", 512, NULL, 0, NULL);
 }
 
+/**
+ * @brief This task waits on a queue to get the results from CANopen.
+ * 				Once received, the command is preprocessed to check if it is
+ * 				a repeatitively result. CANopen sends the same result multiple times,
+ * 				but it needs to be processed just once.
+ */
 static void TaskCmdRxPrcoess(void* arg)
 {
 	results_t results;
@@ -52,6 +65,12 @@ static void TaskCmdRxPrcoess(void* arg)
 	}
 }
 
+/**
+ * @brief Checks if the command/label received is unique. If it is unique,
+ * 				then a filter on accuracy is applied. If there was a pause between
+ * 				 two similar results, then the blink mode is turned on.
+ * @param results The results received from CANOpen network.
+ */
 static void PreprocessCmd(results_t results)
 {
 	static uint8_t prevCmd = BACKGROUND;
@@ -99,6 +118,10 @@ static void PreprocessCmd(results_t results)
 	//spoken twice atleast.
 }
 
+/**
+ * @brief On receiving a valid command, PCA9957 LEDs are turned on.
+ * @param cmd The command to which the a certain action has to be performed.
+ */
 static void CmdToAction(cmd_t cmd)
 {
 
@@ -147,29 +170,38 @@ static void CmdToAction(cmd_t cmd)
 	}
 }
 
-static int16_t CheckAndSetBrightness(int16_t val)
+/**
+ * @brief The brightness range for PCA9957 LED ranges from 0x00-0xFF.
+ *        This function takes care of limiting and resetting the bounds.
+ * @value The current value of the \var brightness.
+ * @retval Returns the adjusted value, if it is outside the range.
+ */
+static int16_t CheckAndSetBrightness(int16_t value)
 {
 	//Turn-off blink for brighter and dimmer to see the changes.
 	LED_BlinkOff();
 
-	if (val < DEFAULT_BRIGHTNESS)
+	if (value < DEFAULT_BRIGHTNESS)
 	{
-		val = DEFAULT_BRIGHTNESS;
+		value = DEFAULT_BRIGHTNESS;
 	}
 
-
-
-	if(val > MAX_BRIGHTNESS)
+	if(value > MAX_BRIGHTNESS)
 	{
-		val = MAX_BRIGHTNESS;
+		value = MAX_BRIGHTNESS;
 	}
 
 	PRINTF("LED Intensity: %.2f %%\r\n", brightness*100/255.0);
 
-	LED_SetBrightness(val);
-	return val;
-
+	LED_SetBrightness(value);
+	return value;
 }
+
+/**
+ * @brief Simple function to check if the accuracy is sufficient.
+ * @param accuracy Accuracy of the received label/command.
+ * @retval Returns true if the accuracy is sufficient.
+ */
 static bool IsAccurate(uint8_t accuracy)
 {
 	return (accuracy >= CMD_ACCURACY_MIN);

@@ -4,9 +4,11 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
+#include <stdio.h>
 #include "board.h"
-#include "fsl_qtmr.h"
+#include "stdbool.h"
 #include "timer.h"
+#include "fsl_qtmr.h"
 
 /*******************************************************************************
  * Definitions
@@ -40,6 +42,9 @@ static cb_timer_handle_t cbTimerTick;
 /*******************************************************************************
  * Code
  ******************************************************************************/
+/**
+ * @brief ISR for QTMR
+ */
 void QTMR_IRQ_HANDLER(void)
 {
 	msTicks++;
@@ -55,7 +60,10 @@ void QTMR_IRQ_HANDLER(void)
 	SDK_ISR_EXIT_BARRIER;
 }
 
-void TIMER_Init()
+/**
+ * @brief Init the timer to generate an interrupt every 1 millisecond.
+ */
+void TIMER_Init(void)
 {
 	qtmr_config_t qtmrConfig;
 
@@ -77,11 +85,18 @@ void TIMER_Init()
 	QTMR_StartTimer(BOARD_QTMR_BASEADDR, BOARD_SECOND_QTMR_CHANNEL, kQTMR_PriSrcRiseEdge);
 }
 
+/**
+ * @brief Returns the number of milliseconds elapsed since the system start.
+ * @return uint32 time value.
+ */
 uint32_t TIMER_GetTimeInMs()
 {
 	return msTicks;
 }
 
+/**
+ * @brief Register a function for a callback on timeout.
+ */
 void TIMER_SetCallBack(cb_timer_handle_t funcPtr)
 {
 	cbTimerTick = funcPtr;
