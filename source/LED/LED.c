@@ -44,7 +44,7 @@ static void LED_SPI_Transfer(uint8_t* pArray, uint8_t size);
  ******************************************************************************/
 
 /**
- * @brief Initialize the SPI driver.
+ * @brief Initialise the SPI driver.
  */
 void LED_Init(void)
 {

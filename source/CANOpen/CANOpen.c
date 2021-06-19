@@ -87,7 +87,7 @@ static void TaskCANOpenSlave(void* arg)
 		// Operate on application
 		if (MY_NMT_STATE == NMTSTATE_OP)
 		{
-			// only when we are operational
+			// only when we are operational, notify the PDO process task to receive the data.
 			xTaskNotify(hTaskPDOProcess, 0, eNoAction);
 		}
 

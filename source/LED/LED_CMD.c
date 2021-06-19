@@ -24,7 +24,7 @@
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-static void TaskCmdRxPrcoess(void* arg);
+static void TaskCmdRxProcess(void* arg);
 static void PreprocessCmd(results_t results);
 static void CmdToAction(cmd_t cmd);
 static int16_t CheckAndSetBrightness(int16_t value);
@@ -45,16 +45,16 @@ static int16_t brightness = DEFAULT_BRIGHTNESS;
  */
 void LED_CMD_Init(void)
 {
-	xTaskCreate(TaskCmdRxPrcoess, "Rx Cmd Task", 512, NULL, 0, NULL);
+	xTaskCreate(TaskCmdRxProcess, "Rx Cmd Task", 512, NULL, 0, NULL);
 }
 
 /**
  * @brief This task waits on a queue to get the results from CANopen.
- * 				Once received, the command is preprocessed to check if it is
- * 				a repeatitively result. CANopen sends the same result multiple times,
+ * 				Once received, the command is pre-processed to check if it is
+ * 				a repetitive result. CANopen sends the same result multiple times,
  * 				but it needs to be processed just once.
  */
-static void TaskCmdRxPrcoess(void* arg)
+static void TaskCmdRxProcess(void* arg)
 {
 	results_t results;
 
@@ -68,7 +68,7 @@ static void TaskCmdRxPrcoess(void* arg)
 /**
  * @brief Checks if the command/label received is unique. If it is unique,
  * 				then a filter on accuracy is applied. If there was a pause between
- * 				 two similar results, then the blink mode is turned on.
+ * 				two similar results, then the blink mode is turned on.
  * @param results The results received from CANOpen network.
  */
 static void PreprocessCmd(results_t results)
@@ -120,11 +120,10 @@ static void PreprocessCmd(results_t results)
 
 /**
  * @brief On receiving a valid command, PCA9957 LEDs are turned on.
- * @param cmd The command to which the a certain action has to be performed.
+ * @param cmd The command to which a certain action has to be performed.
  */
 static void CmdToAction(cmd_t cmd)
 {
-
 	switch(cmd)
 	{
 	case YES:
